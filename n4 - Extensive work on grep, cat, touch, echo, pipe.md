@@ -1,4 +1,3 @@
-
 # Some commands and their explanation:
 
 ### **1. `grep -i -o 'd' file.txt`**
@@ -1635,4 +1634,4 @@ ls my\ file.txt    # Escape method
 ---
 
 
-[[n5]]
+[[n5 - more and less]]
