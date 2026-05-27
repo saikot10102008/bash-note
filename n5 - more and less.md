@@ -117,3 +117,7 @@ cat /var/log/syslog
 cat /var/log/syslog | less
 ```
 
+
+
+---
+[[n6 - help, type, man]]
