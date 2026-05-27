@@ -762,3 +762,196 @@ These commands collectively teach you about Unix architecture:
 | **Kernel syscalls** | `open()`, `kill()` | `man 2` |
 | **C libraries** | `printf()`, `malloc()` | `man 3` |
 
+---
+---
+---
+**In Bash (the Bourne Again SHell), you interact with the system through commands.** Some are built directly into the shell, while others are separate programs. Understanding documentation tools and command types is essential for effective use.
+
+### External Commands vs. Builtin Commands
+
+**Builtin commands** are part of the Bash shell itself. They execute within the shell process without starting a new program. This makes them faster and allows them to modify the shell's internal state (e.g., changing the current directory). 
+
+Examples: `cd`, `echo`, `help`, `type`, `history`, `exit`, `pwd`.
+
+**External commands** (also called disk commands or utilities) are separate executable files on the filesystem, usually in directories like `/usr/bin`, `/bin`, etc. Bash finds them via the `PATH` environment variable and launches them as new processes. 
+
+Examples: `ls`, `cat`, `grep`, `awk`, `find`, `man`.
+
+**Key differences**:
+- Builtins are always available and faster (no process overhead).
+- Externals can be replaced or versioned independently.
+- Some commands exist in both forms (e.g., `echo` is a builtin but also has `/usr/bin/echo`).
+
+**Example**:
+```bash
+# Run builtin echo (fast, integrated)
+echo "Hello from builtin"
+
+# Force external echo (if it exists)
+command /usr/bin/echo "Hello from external"
+```
+
+### The `type` Command
+
+The `type` command tells you what kind of command something is: builtin, external file, alias, function, keyword, etc.
+
+**Basic usage**:
+```bash
+type <command_name>
+```
+
+**Examples**:
+```bash
+type cd
+# Output: cd is a shell builtin
+
+type ls
+# Output: ls is aliased to 'ls --color=auto'   (common on many systems)
+
+type echo
+# Output: echo is a shell builtin
+
+type man
+# Output: man is /usr/bin/man   (external)
+
+type which
+# Output: which is /usr/bin/which   (external)
+```
+
+**Useful options**:
+- `type -a <command>`: Shows all matches (builtin + external if both exist).
+- `type -t <command>`: Returns a short type string (`builtin`, `file`, `alias`, etc.).
+
+```bash
+type -a echo
+# Might show: echo is a shell builtin
+#             echo is /usr/bin/echo
+
+type -t cd
+# Output: builtin
+```
+
+`type` is itself a builtin, so it's very reliable for shell-specific information.
+
+### The `which` Command
+
+`which` shows the full path to an **external** executable that would be executed. It does **not** see builtins, aliases, or functions (because it's an external command itself).
+
+**Usage**:
+```bash
+which <command>
+```
+
+**Examples**:
+```bash
+which ls
+# Output: /usr/bin/ls   (or similar)
+
+which cd
+# Output: (nothing, because cd is builtin)
+
+which man
+# Output: /usr/bin/man
+```
+
+**Note**: On some systems, `which` may be aliased or have limitations. `type -P <command>` or `command -v <command>` are often better alternatives for finding executables.
+
+### The `help` Command
+
+`help` provides quick documentation specifically for **Bash builtin commands** and shell keywords. It is the equivalent of `man` for things built into Bash.
+
+**Usage**:
+```bash
+help                  # Lists all available builtins
+help <builtin_name>   # Detailed help for one builtin
+```
+
+**Examples**:
+```bash
+help cd
+# Shows:
+# cd: cd [-L|[-P [-e]] [-@]] [dir]
+#     Change the shell working directory.
+#     ...
+
+help echo
+# Shows options and behavior of the builtin echo
+
+help help
+# Shows how to use help itself
+```
+
+`help` is very fast and always available for builtins. It won't work well for external commands like `ls` or `grep`.
+
+### The `man` Command (Manual Pages)
+
+`man` displays the full manual page (documentation) for commands, programs, system calls, configuration files, etc. These are comprehensive reference documents installed on the system.
+
+**Usage**:
+```bash
+man <command_or_topic>
+man <section> <topic>   # e.g., man 1 ls
+```
+
+**Structure of a typical man page**:
+- **NAME**: Command name and short description
+- **SYNOPSIS**: How to use it (options, arguments)
+- **DESCRIPTION**: Detailed explanation
+- **OPTIONS**: List of flags
+- **EXAMPLES** (sometimes)
+- **SEE ALSO**, **BUGS**, etc.
+
+**Examples**:
+```bash
+man ls
+# Full documentation for ls command
+
+man man
+# Documentation about the man command itself
+
+man bash
+# The massive manual for Bash itself
+```
+
+**Navigating man pages**:
+- Arrow keys / Page Up/Down: Scroll
+- `/searchterm`: Search forward
+- `n`: Next match
+- `q`: Quit
+
+**Sections** (man uses numbered sections):
+- 1: User commands
+- 5: File formats
+- 8: System administration
+
+Example: `man 5 passwd` for the password file format.
+
+### Difference Between `help` and `man`
+
+| Aspect              | `help`                          | `man`                              |
+|---------------------|---------------------------------|------------------------------------|
+| Scope               | Bash builtins & keywords only   | Almost everything (commands, files, libraries, etc.) |
+| Detail Level        | Brief, concise                  | Comprehensive, detailed            |
+| Speed               | Very fast                       | Slightly slower (loads file)       |
+| Best For            | Quick reference for `cd`, `echo`, etc. | Full reference for any command     |
+| Works on            | Builtins only                   | Externals and more                 |
+
+**Practical tip**: 
+- For a builtin like `cd` → use `help cd`
+- For an external like `ls` → use `man ls`
+- If unsure → use `type` first, then choose `help` or `man`
+
+### Other Useful Documentation Commands
+
+- `whatis <command>`: One-line description.
+- `apropos <keyword>` or `man -k <keyword>`: Search man pages by keyword.
+- `info <command>`: Alternative documentation system (sometimes more detailed than man).
+
+**Example workflow when you don't know a command**:
+```bash
+type ls          # Check what it is
+man ls           # Full docs (if external)
+help echo        # If it's a builtin
+which ls         # Find location
+```
+
